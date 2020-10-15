@@ -2,6 +2,7 @@ package com.edu.phonetest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Button sendVerificationCode;   // 发送验证码
     private EditText etVerificationCode;   // 验证码
     private Button nextStep;               // 下一步
-
+    private int time= 30;
     private String phoneNumber;         // 电话号码
     private String verificationCode;    // 验证码
     private boolean flag;   // 操作是否成功
@@ -83,6 +84,20 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, "请输入电话号码", Toast.LENGTH_SHORT).show();
                     etPhoneNumber.requestFocus();
                 }
+                CountDownTimer countDownTimer = new CountDownTimer(60000,1000) {
+                    @Override
+                    public void onTick(long l) {
+                        sendVerificationCode.setEnabled(false);
+                        sendVerificationCode.setText("已发送("+ l/1000+")");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        sendVerificationCode.setText("重新获取验证码");
+                        sendVerificationCode.setEnabled(true);
+                    }
+                }.start();
+
                 break;
 
             case R.id.btn2:
@@ -110,6 +125,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             int event = msg.arg1;
             int result = msg.arg2;
             Object data = msg.obj;
+//            switch (msg.what){
+//                case 1:
+//                    sendVerificationCode.setText("重新发送"+time);
+//                    sendVerificationCode.setClickable(false);
+//                    break;
+//                case 2:
+//                    sendVerificationCode.setClickable(true);
+//                    sendVerificationCode.setText("发送验证码");
+//                    break;
+//
+//            }
 
             if (result == SMSSDK.RESULT_COMPLETE) {
                 // 如果操作成功
@@ -137,37 +163,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
-    //主线程 handle
-//    Handler handler = new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//                int event = msg.arg1;
-//                int result = msg.arg2;
-//                Object data = msg.obj;
-//
-//                if (result == SMSSDK.RESULT_COMPLETE){
-//                    if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE){
-//                        Toast.makeText(RegisterActivity.this,"验证码成功",Toast.LENGTH_SHORT).show();
-//                        Intent intent = new Intent(RegisterActivity.this,LoginActivity.class);
-//                        startActivity(intent);
-//                    }
-//                    else if(event == SMSSDK.EVENT_GET_VERIFICATION_CODE){
-//                        Toast.makeText(RegisterActivity.this,"验证码已发送",Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                } else {
-//                    if (flag){
-//                        Toast.makeText(RegisterActivity.this,"验证码获取失败请重新发送",Toast.LENGTH_SHORT).show();
-//                        etPhoneNumber.requestFocus();
-//                    }
-//                    else {
-//                        ((Throwable) data).printStackTrace();
-//                        Toast.makeText(RegisterActivity.this,"验证码错误",Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            }
-//        };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
