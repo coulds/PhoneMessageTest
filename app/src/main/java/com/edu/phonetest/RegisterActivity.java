@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,10 +22,13 @@ import cn.smssdk.SMSSDK;
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText etPhoneNumber;        // 电话号码
+    private  EditText password;//密码
+
     private Button sendVerificationCode;   // 发送验证码
     private EditText etVerificationCode;   // 验证码
     private Button nextStep;               // 下一步
     private int time= 30;
+
     private String phoneNumber;         // 电话号码
     private String verificationCode;    // 验证码
     private boolean flag;   // 操作是否成功
@@ -58,7 +62,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void init() {
 
-        etPhoneNumber = (EditText) findViewById(R.id.editText);
+
+
+        password=(EditText) findViewById(R.id.passworld);//密码
+        etPhoneNumber = (EditText) findViewById(R.id.editText);//电话
+
         etVerificationCode = findViewById(R.id.yanzhengma);
         sendVerificationCode = findViewById(R.id.btn1);
         nextStep = findViewById(R.id.btn2);
@@ -70,9 +78,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn1:
+
+
                 if (!TextUtils.isEmpty(etPhoneNumber.getText())) {
                     if (etPhoneNumber.getText().length() == 11) {
-                        phoneNumber = etPhoneNumber.getText().toString();
+                        phoneNumber = etPhoneNumber.getText().toString().trim();
                         SMSSDK.getVerificationCode("86", phoneNumber); // 发送验证码给号码的 phoneNumber 的手机
                         etVerificationCode.requestFocus();
                     }
@@ -141,8 +151,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 // 如果操作成功
                 if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     // 校验验证码，返回校验的手机和国家代码
+
+                    String pass=password.getText().toString().trim();
+                    PhoneService phoneService= new PhoneService(RegisterActivity.this);
+                    Log.i("TAG",phoneNumber+"_"+pass);
+                    Phone phone = new Phone();
+                    phone.setPhonename(phoneNumber);
+                    phone.setPassword(pass);
+                    phoneService.register(phone);
+
                     Toast.makeText(RegisterActivity.this, "验证成功", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     startActivity(intent);
                 } else if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                     // 获取验证码成功，true为智能验证，false为普通下发短信
