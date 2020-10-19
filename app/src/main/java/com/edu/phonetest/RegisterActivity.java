@@ -27,7 +27,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private Button sendVerificationCode;   // 发送验证码
     private EditText etVerificationCode;   // 验证码
-    private Button nextStep;               // 下一步
+    private Button nextStep;         // 提交
+    private Button Login;            //登录
     private int time= 30;
 
     private String phoneNumber;         // 电话号码
@@ -72,7 +73,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         etVerificationCode = findViewById(R.id.yanzhengma);
         sendVerificationCode = findViewById(R.id.btn1);
         nextStep = findViewById(R.id.btn2);
-
+        Login = findViewById(R.id.btn3);
+        Login.setOnClickListener(this);
         sendVerificationCode.setOnClickListener(this);
         nextStep.setOnClickListener(this);
     }
@@ -82,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (view.getId()){
             case R.id.btn1:
 
-                if (!TextUtils.isEmpty(etPhoneNumber.getText())) {
+                if (!TextUtils.isEmpty(etPhoneNumber.getText())&&!TextUtils.isEmpty(password.getText())) {
                     if (etPhoneNumber.getText().length() == 11) {
                         phoneNumber = etPhoneNumber.getText().toString().trim();
                         SMSSDK.getVerificationCode("86", phoneNumber); // 发送验证码给号码的 phoneNumber 的手机
@@ -105,11 +107,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         Toast.makeText(this, "请输入完整的电话号码", Toast.LENGTH_SHORT).show();
                         etPhoneNumber.requestFocus();
                     }
-                } else {
-                    Toast.makeText(this, "请输入电话号码", Toast.LENGTH_SHORT).show();
+                } else  {
+                    Toast.makeText(this, "请输入电话号码和密码", Toast.LENGTH_SHORT).show();
                     etPhoneNumber.requestFocus();
                 }
-
 
                 break;
 
@@ -120,12 +121,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         SMSSDK.submitVerificationCode("86",phoneNumber,verificationCode);
                         flag = false;
                     }else {
-                        Toast.makeText(RegisterActivity.this,"请输入6位验证码",Toast.LENGTH_LONG).show();
+                        Toast.makeText(RegisterActivity.this,"请输入6位验证码",Toast.LENGTH_SHORT).show();
                     }
                 }else {
                     Toast.makeText(RegisterActivity.this,"请输入验证码",Toast.LENGTH_SHORT).show();
                 }
                 break;
+
+            case R.id.btn3:
+                finish();
                 default:
                     break;
         }
